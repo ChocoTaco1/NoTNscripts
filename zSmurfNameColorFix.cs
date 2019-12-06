@@ -1,3 +1,8 @@
+// zSmurfNameColorFix.cs
+// Takes out the Alias color change for smurfs
+// So when youre running a server without tribesnext
+// Every name isnt Alias blue
+
 package SmurfFix
 {
 
