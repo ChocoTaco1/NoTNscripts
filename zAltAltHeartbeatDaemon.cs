@@ -1,7 +1,9 @@
 // zAltAltHeartbeatDaemon.cs
+//
 // Alternate Alternate Heartbeat Deamon
 // The alternative to the alternative heartbeat for non tribesnext servers
 // To still show up tho, on the tribesnext master server. 
+//
 
 // Tribesnext Beat Stock Values
 // Dont change these
