@@ -1,8 +1,13 @@
 // zAltAltHeartbeatDaemon.cs
 // Alternate Alternate Heartbeat Deamon
 // The alternative to the alternative heartbeat for non tribesnext servers
-// To still show up tho, on the tribesnext master server.
-// 
+// To still show up tho, on the tribesnext master server. 
+
+// Tribesnext Beat Stock Values
+// Dont change these
+$Host::TN::beat = 3;
+$Host::TN::echo = 1;
+
 
 package AlternateAlternateHeartbeat
 {
