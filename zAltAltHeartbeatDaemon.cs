@@ -22,7 +22,7 @@ function AlternateAlternateHeartbeat()
 	
     // Create an HTTP object for communications  
     if (!isObject(TNMasterServer))
-      %watup = new TCPObject(TNMasterServer){};
+      %watup = new HTTPObject(TNMasterServer);
     else 
 	  %watup = TNMasterServer;
 
