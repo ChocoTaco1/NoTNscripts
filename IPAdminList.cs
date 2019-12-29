@@ -41,7 +41,11 @@ function isOnAdminList(%client)
    for(%i = 0; %i < %totalRecords; %i++)
    {
       %record = getField( getRecord( $Host::AdminList, 0 ), %i);
-      if(%record == %guidip)
+	  //Separate the two fields
+	  %recordip = getField(strreplace(%record,":","\t"),0);
+	  %recordguid = getField(strreplace(%record,":","\t"),1);
+	  //Both are compared individully
+      if(%recordip == %ip && %recordguid == %client.guid)
          return true;
    }
    
@@ -60,8 +64,12 @@ function isOnSuperAdminList(%client)
    
    for(%i = 0; %i < %totalRecords; %i++)
    {
-      %record = getField( getRecord( $Host::superAdminList, 0 ), %i);
-      if(%record == %guidip)
+      %record = getField( getRecord( $Host::AdminList, 0 ), %i);
+	  //Separate the two fields
+	  %recordip = getField(strreplace(%record,":","\t"),0);
+	  %recordguid = getField(strreplace(%record,":","\t"),1);
+	  //Both are compared individully
+      if(%recordip == %ip && %recordguid == %client.guid)
          return true;
    }
    
