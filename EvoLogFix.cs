@@ -33,7 +33,7 @@ function connectLog(%client)
 	
 	  // connect info
 	  %ConnectLogPlayerCount = $HostGamePlayerCount;
-	  $ConnectLog = formatTimeString("d-M-yy") SPC formatTimeString("[HH:nn]") SPC %client.nameBase SPC "("%client.guid @ "," SPC %client.getAddress() @ ")" SPC "Pop[" @ %ConnectLogPlayerCount @ "]" SPC "Map[" @ $CurrentMission @ "]" SPC "NTC[" @ %ntc @ "]";
+	  $ConnectLog = formatTimeString("d-M-yy") SPC formatTimeString("[HH:nn]") SPC %client.nameBase SPC "(" SPC %client.guid @ "," SPC %client.getAddress() @ ")" SPC "Pop[" @ %ConnectLogPlayerCount @ "]" SPC "Map[" @ $CurrentMission @ "]" SPC "NTC[" @ %ntc @ "]";
 
       // log the message
       if($Host::EvoDailyLogs)
