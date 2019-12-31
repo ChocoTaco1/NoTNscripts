@@ -25,15 +25,13 @@ function connectLog(%client)
 {
    if($Host::EvoConnectLogging)
    {
-      // net tournament client present?
-	  if (!%client.t2csri_sentComCertDone)
-		%ntc = 0;
-	  else
-		%ntc = 1;
-	
+	  // get the client info
+	  %authInfo = getAuthInfo(%client);
+	  %ip = getField(strreplace(%client.getAddress(),":","\t"),1);
+	  
 	  // connect info
 	  %ConnectLogPlayerCount = $HostGamePlayerCount;
-	  $ConnectLog = formatTimeString("d-M-yy") SPC formatTimeString("[HH:nn]") SPC %client.nameBase SPC "(" SPC %client.guid @ "," SPC %client.getAddress() @ ")" SPC "Pop[" @ %ConnectLogPlayerCount @ "]" SPC "Map[" @ $CurrentMission @ "]" SPC "NTC[" @ %ntc @ "]";
+	  $ConnectLog = formatTimeString("d-M-yy") SPC formatTimeString("[HH:nn]") SPC %client.nameBase SPC "(" @ getField(%authInfo, 0) @ "," SPC getField(%authInfo, 1) @ "," @ "," SPC %ip @ ")" SPC "Pop[" @ %ConnectLogPlayerCount @ "]" SPC "Map[" @ $CurrentMission @ "]";
 
       // log the message
       if($Host::EvoDailyLogs)
