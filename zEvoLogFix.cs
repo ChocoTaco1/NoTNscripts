@@ -25,11 +25,11 @@ function connectLog(%client)
 {
    if($Host::EvoConnectLogging)
    {
-	  %ip = %client.getAddress();
-	  
-	  // connect info
-	  %ConnectLogPlayerCount = $HostGamePlayerCount;
-	  $ConnectLog = formatTimeString("d-M-yy") SPC formatTimeString("[HH:nn]") SPC %client.nameBase SPC "(" @ getField(%client.t2csri_cert, 0) @ "," SPC getField(%client.t2csri_cert, 1); @ "," @ "," SPC %ip @ ")" SPC "Pop[" @ %ConnectLogPlayerCount @ "]" SPC "Map[" @ $CurrentMission @ "]";
+      // get the client info
+      %authInfo = %client.getAuthInfo();
+
+      // this is the info that will be logged
+      $ConnectLog = formatTimeString("d-M-yy") SPC formatTimeString("[HH:nn]") SPC %client.nameBase @ " (" @ getField(%authInfo, 0) @ ", " @ getField(%authInfo, 1) @ ", " @ %client.guid @ ", " @ %client.getAddress() @ ")" SPC "Pop[" @ $HostGamePlayerCount @ "]" SPC "Map[" @ $CurrentMission @ "]";
 
       // log the message
       if($Host::EvoDailyLogs)
