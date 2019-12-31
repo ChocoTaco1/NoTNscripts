@@ -19,32 +19,13 @@ if (!isActivePackage(StartEvoLogFix))
 package EvoLogFix
 {
 
-// connectLog(%client, %realname, %tag)
-// Info: Logs the connections
-function connectLog(%client)
+function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %voicePitch)
 {
-   if($Host::EvoConnectLogging)
-   {
-      // get the client info
-      %authInfo = %client.getAuthInfo();
+   // Call the standard procedure ...
+   Parent::onConnect( %client, %name, %raceGender, %skin, %voice, %voicePitch );
 
-      // this is the info that will be logged
-      $ConnectLog = formatTimeString("d-M-yy") SPC formatTimeString("[HH:nn]") SPC %client.nameBase @ " (" @ getField(%authInfo, 0) @ ", " @ getField(%authInfo, 1) @ ", " @ %client.guid @ ", " @ %client.getAddress() @ ")" SPC "Pop[" @ $HostGamePlayerCount @ "]" SPC "Map[" @ $CurrentMission @ "]";
-
-      // log the message
-      if($Host::EvoDailyLogs)
-      {
-         if(formatTimeString("HH") > getSubStr($Host::EvoDailyHour, 0, strstr($Host::EvoDailyHour, ":")) || (formatTimeString("HH") == getSubStr($Host::EvoDailyHour, 0, strstr($Host::EvoDailyHour, ":")) && formatTimeString("nn") >= getSubStr($Host::EvoDailyHour, strstr($Host::EvoDailyHour, ":")+1, 2)))
-            export("$ConnectLog", "logs/Connect/ConnectLog-" @ formatTimeString("d-M-yy") @ ".txt", true);
-         else
-         {
-            %yesterday = formatTimeString("d") - 1;
-            export("$ConnectLog", "logs/Connect/ConnectLog-" @ %yesterday @ formatTimeString("-M-yy") @ ".txt", true);
-         }
-      }
-      else
-         export("$ConnectLog", "logs/Connect/ConnectLog.txt", true);
-   }
+   // Log the connection
+   connectLog(%client);
 }
 
 };
