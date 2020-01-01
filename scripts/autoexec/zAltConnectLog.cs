@@ -7,7 +7,7 @@ package AltConnectLog
 	
 function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %voicePitch)
 {
-	parent::GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %voicePitch);
+	parent::onConnect(%client, %name, %raceGender, %skin, %voice, %voicePitch);
 	
 	// Log the connection
 	Alt_connectLog(%client);
