@@ -6,7 +6,7 @@ function CreateServer( %mission, %missionType )
 	parent::CreateServer( %mission, %missionType );
 	
 	deactivate(evolution_package);
-	exec("scripts/autoexec/evolution.cs");
+	activate(evolution_package);
 }
 
 };
