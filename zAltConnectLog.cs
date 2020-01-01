@@ -1,3 +1,11 @@
+// zAltConnectLog
+//
+// This is to get around connectlog not working in evo in linux
+// Just make our own and call it
+
+//Enable Console Logs
+setLogMode(1);
+
 //All other connect logging is off
 $Host::ClassicConnectLog = 0;
 $Host::EvoConnectLogging = 0;
