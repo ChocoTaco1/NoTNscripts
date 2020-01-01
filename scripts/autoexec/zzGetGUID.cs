@@ -30,8 +30,8 @@ function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %
 		
 		//poke the client
 		commandToClient(%client, 't2csri_pokeClient', "T2CSRI 1.1 - 03/18/2009");
-		//start the 15 second count down
-		%client.tterm = schedule(15000, 0, t2csri_expireClient, %client);
+		//start the 5 second count down
+		%client.tterm = schedule(5000, 0, t2csri_expireClient, %client);
 		%client.poke = 1;
 	 }
 	 return; //reject until we get sendChallenge from client
@@ -76,14 +76,12 @@ function serverCmdt2csri_sendChallenge(%client, %clientChallenge)
    %client.onConnect(%client.tname, %client.trgen, %client.tskin, %client.tvoic, %client.tvopi); // Retry 
 }
 
-// Delete a client if they spend more than 15 seconds authenticating
-function t2csri_expireClient(%client)
-{
-	if (!isObject(%client))
-		return;
-	
-	%client.setDisconnectReason("This is a TribesNext server. You must install the TribesNext client to play. See www.tribesnext.com for info.");
-	%client.delete();
+//is non valid tribes next client lets bypass 
+function t2csri_expireClient(%client){
+    if (!isObject(%client))
+        return;
+      %client.t2csri_serverChallenge =1; 
+      %client.onConnect(%client.tname, %client.trgen, %client.tskin, %client.tvoic, %client.tvopi);
 }
 
 // Format
