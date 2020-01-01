@@ -24,36 +24,11 @@ package EvoLogFix
 	
 // connectLog(%client, %realname, %tag)
 // Info: Logs the connections
-function connectLog(%client)
+function connectLog(%client, %logthis)
 {
-   if($Host::EvoConnectLogging && %linuxconnectlog)
+   if(%logthis)
    {
-      // get the client info
-      %authInfo = %client.getAuthInfo();
-
-      // net tournament client present?
-	  if (!%client.t2csri_sentComCertDone)
-		%ntc = 0;
-	  else
-		%ntc = 1;
-	
-	  // connect info
-	  %ConnectLogPlayerCount = $HostGamePlayerCount;
-	  $ConnectLog = formatTimeString("d-M-yy") SPC formatTimeString("[HH:nn]") SPC %client.nameBase SPC "(" @ getField(%authInfo, 0) @ "," SPC %client.guid @ "," SPC %client.getAddress() @ ")" SPC "Pop[" @ %ConnectLogPlayerCount @ "]" SPC "Map[" @ $CurrentMission @ "]" SPC "NTC[" @ %ntc @ "]";
-
-      // log the message
-      if($Host::EvoDailyLogs)
-      {
-         if(formatTimeString("HH") > getSubStr($Host::EvoDailyHour, 0, strstr($Host::EvoDailyHour, ":")) || (formatTimeString("HH") == getSubStr($Host::EvoDailyHour, 0, strstr($Host::EvoDailyHour, ":")) && formatTimeString("nn") >= getSubStr($Host::EvoDailyHour, strstr($Host::EvoDailyHour, ":")+1, 2)))
-            export("$ConnectLog", "logs/Connect/ConnectLog-" @ formatTimeString("d-M-yy") @ ".txt", true);
-         else
-         {
-            %yesterday = formatTimeString("d") - 1;
-            export("$ConnectLog", "logs/Connect/ConnectLog-" @ %yesterday @ formatTimeString("-M-yy") @ ".txt", true);
-         }
-      }
-      else
-         export("$ConnectLog", "logs/Connect/ConnectLog.txt", true);
+		parent::connectLog(%client, %logthis);
    }
 }
 
@@ -63,8 +38,8 @@ function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %
    Parent::onConnect( %client, %name, %raceGender, %skin, %voice, %voicePitch );
 
    // Log the connection
-   %linuxconnectlog = 1;
-   connectLog(%client, %linuxconnectlog);
+   %logthis = true;
+   connectLog(%client, %logthis);
 }
 
 };
