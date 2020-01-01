@@ -44,7 +44,10 @@ function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %
   //%client.nameBase = getField(%client.t2csri_cert, 0);// only for testing 
   //%client.guid = getField(%client.t2csri_cert, 1); // only for testing
   parent::onConnect(%client, %name, %raceGender, %skin, %voice, %voicePitch);  
-	  
+  
+  // Log the connection
+  connectLog(%client);
+  
   %client.doneAuthenticating = 1;
 }
 	
