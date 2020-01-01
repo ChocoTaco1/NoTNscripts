@@ -12,8 +12,10 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
 {
 	parent::GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, %voicePitch );
 
-	// Use regular white color no matter what
-	%name = "\cp\c6" @ %name @ "\co";
+	if(%client.guid $= "")
+		%name = "\cp\c8" @ %name @ "\co";
+	else
+		%name = "\cp\c6" @ %name @ "\co";
 }
 
 };
