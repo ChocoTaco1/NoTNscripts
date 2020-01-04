@@ -237,15 +237,9 @@ function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %
 		case OTHER:
 			%name = stripChars( detag( %name ), "@" );
 			if(%client.guid $= "")
-			{
 				%name = "\cp\c8" @ %name @ "\co";
-				%client.nameBase = %smurfName;
-			}
 			else
-			{
 				%name = "\cp\c6" @ %name @ "\co";
-				%client.nameBase = %realName;
-			}
 		case PREPEND:
 			%cleanName = stripChars( detag( %prepend ), "@" );
 			%name = "\cp\c7" @ %tag @ "\c6" @ %cleanName @ "\co";
@@ -254,7 +248,11 @@ function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %
 			%name = "\cp\c6" @ %cleanName @ "\c7" @ %tag @ "\co";
 	}
 
-   %client.name = addTaggedString(%name);
+    %client.name = addTaggedString(%name);
+    if(%client.isSmurf)
+       %client.nameBase = %smurfName;
+    else
+       %client.nameBase = %realName;
 
    //Allow - ChocoTaco
    // Make sure that the connecting client is not trying to use a bot skin:
