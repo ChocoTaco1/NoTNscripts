@@ -216,8 +216,45 @@ function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %
 
       %smurfName = %name;
       // Tag the name with the "smurf" color:
-      %name = "\cp\c8" @ %name @ "\co";
+      //%name = "\cp\c8" @ %name @ "\co";
    }
+
+	// Add the tribal tag:
+    %tag = getField(strreplace(%name,"@","\t"),1);
+	%prepend = getField(strreplace(%name,"@","\t"),2);
+	%append = getField(strreplace(%name,"@","\t"),0);
+	if(%tag !$= "" && %append $= "" && %prepend $= "") //If someone trys @myname@
+		%nameMode = "OTHER";
+	else if(%tag !$= "" && %prepend !$= "")
+		%nameMode = "PREPEND";
+	else if(%tag !$= "" && %append !$= "")
+		%nameMode = "APPEND";
+	else if(%tag $= "") //Normal
+		%nameMode = "OTHER";
+	
+	switch$(%nameMode)
+	{
+		case OTHER:
+			%name = stripChars( detag( %name ), "@" );
+			if(%client.guid $= "")
+			{
+				%name = "\cp\c8" @ %name @ "\co";
+				%client.nameBase = %smurfName;
+			}
+			else
+			{
+				%name = "\cp\c6" @ %name @ "\co";
+				%client.nameBase = %realName;
+			}
+		case PREPEND:
+			%cleanName = stripChars( detag( %prepend ), "@" );
+			%name = "\cp\c7" @ %tag @ "\c6" @ %cleanName @ "\co";
+		case APPEND:
+			%cleanName = stripChars( detag( %append ), "@" );
+			%name = "\cp\c6" @ %cleanName @ "\c7" @ %tag @ "\co";
+	}
+
+   %client.name = addTaggedString(%name);
 
    //Allow - ChocoTaco
    // Make sure that the connecting client is not trying to use a bot skin:
@@ -274,6 +311,41 @@ function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %
    //commandToClient(%client, 'getManagerID', %client);
 
    commandToClient(%client, 'setBeaconNames', "Target Beacon", "Marker Beacon", "Bomb Target");
+
+   if ( $CurrentMissionType !$= "SinglePlayer" ) 
+   {
+      // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
+      messageClient(%client, 'MsgClientJoin', 'Welcome to Tribes2 %1.', 
+                    %client.name, 
+                    %client, 
+                    %client.target, 
+                    false,   // isBot 
+                    %client.isAdmin, 
+                    %client.isSuperAdmin, 
+                    %client.isSmurf, 
+                    %client.sendGuid );
+       // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
+
+      messageAllExcept(%client, -1, 'MsgClientJoin', '\c1%1 joined the game.', 
+                       %client.name, 
+                       %client, 
+                       %client.target, 
+                       false,   // isBot 
+                       %client.isAdmin, 
+                       %client.isSuperAdmin, 
+                       %client.isSmurf,
+                       %client.sendGuid );
+   }
+   else
+      messageClient(%client, 'MsgClientJoin', "\c0Mission Insertion complete...", 
+            %client.name, 
+            %client, 
+            %client.target, 
+            false,   // isBot 
+            false,   // isAdmin 
+            false,   // isSuperAdmin 
+            false,   // isSmurf
+            %client.sendGuid );
 
    //Game.missionStart(%client);
    setDefaultInventory(%client);
@@ -337,78 +409,6 @@ function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %
          }
       }
    }
-	
-	%client.name = addTaggedString(%name);
-	%rawName = stripChars( detag( getTaggedString( %client.name )), "\cp\co\c6\c7\c8\c9" );
-	
-	// Add the tribal tag:
-    %tag = getField(strreplace(%rawName,"@","\t"),1);
-	if(%tag !$= "")
-	{
-		%append = getField(strreplace(%rawName,"@","\t"),0);
-		if ( %append !$= "" )
-		{
-			%cleanName = stripChars( detag( %append ), "@" );
-			%name = "\cp\c6" @ %cleanName @ "\c7" @ %tag @ "\co";
-		}
-		else
-		{
-			%beginning = getField(strreplace(%rawName,"@","\t"),2);
-			%cleanName = stripChars( detag( %beginning ), "@" );
-			%name = "\cp\c7" @ %tag @ "\c6" @ %cleanName @ "\co";
-		}
-		%client.NameBase = %cleanName;
-	}
-	else //no clantag
-	{
-		if(%client.guid $= "")
-		{
-			%name = "\cp\c8" @ %name @ "\co";
-			%client.nameBase = %smurfName;
-		}
-		else
-		{
-			%name = "\cp\c6" @ %name @ "\co";
-			%client.nameBase = %realName;
-		}
-	}
-	
-   %client.name = addTaggedString(%name);
-	   
-   if ( $CurrentMissionType !$= "SinglePlayer" ) 
-   {
-      // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
-      messageClient(%client, 'MsgClientJoin', 'Welcome to Tribes2 %1.', 
-                    %client.name, 
-                    %client, 
-                    %client.target, 
-                    false,   // isBot 
-                    %client.isAdmin, 
-                    %client.isSuperAdmin, 
-                    %client.isSmurf, 
-                    %client.sendGuid );
-       // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
-
-      messageAllExcept(%client, -1, 'MsgClientJoin', '\c1%1 joined the game.', 
-                       %client.name, 
-                       %client, 
-                       %client.target, 
-                       false,   // isBot 
-                       %client.isAdmin, 
-                       %client.isSuperAdmin, 
-                       %client.isSmurf,
-                       %client.sendGuid );
-   }
-   else
-      messageClient(%client, 'MsgClientJoin', "\c0Mission Insertion complete...", 
-            %client.name, 
-            %client, 
-            %client.target, 
-            false,   // isBot 
-            false,   // isAdmin 
-            false,   // isSuperAdmin 
-            false,   // isSmurf
-            %client.sendGuid );
   
   %client.doneAuthenticating = 1;
 }
