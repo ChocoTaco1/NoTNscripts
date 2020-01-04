@@ -1,4 +1,4 @@
-// GetGUID.cs
+// zOnConnect.cs
 //
 // To get the guid of the client(If they have one) for reference.
 // Generally for normal server things that need it.
@@ -411,6 +411,9 @@ function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %
    }
   
   %client.doneAuthenticating = 1;
+  
+  //Log the connection
+  Alt_connectLog(%client);
 }
 	
 };

@@ -10,22 +10,26 @@ setLogMode(1);
 $Host::ClassicConnectLog = 0;
 $Host::EvoConnectLogging = 0;
 
-package AltConnectLog
-{
+//********** Moved to zOnConnect.cs **********
+
+//package AltConnectLog
+//{
 	
-function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %voicePitch)
-{
-	parent::onConnect(%client, %name, %raceGender, %skin, %voice, %voicePitch);
+//function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %voicePitch)
+//{
+//	parent::onConnect(%client, %name, %raceGender, %skin, %voice, %voicePitch);
+//	
+//	// Log the connection
+//	Alt_connectLog(%client);
+//}
 	
-	// Log the connection
-	Alt_connectLog(%client);
-}
-	
-};
+//};
 
 // Prevent package from being activated if it is already
-if (!isActivePackage(AltConnectLog))
-    activatePackage(AltConnectLog);
+//if (!isActivePackage(AltConnectLog))
+//    activatePackage(AltConnectLog);
+
+//********************************************
 
 // connectLog(%client, %realname, %tag)
 // Info: Logs the connections
