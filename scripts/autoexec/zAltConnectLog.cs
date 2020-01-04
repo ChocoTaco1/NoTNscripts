@@ -1,6 +1,6 @@
 // zAltConnectLog
 //
-// This is to get around connectlog not working in evo in linux
+// This is to get around connectlog not working properly in evo in linux
 // Just make our own and call it
 
 //Enable Console Logs
@@ -10,7 +10,7 @@ setLogMode(1);
 $Host::ClassicConnectLog = 0;
 $Host::EvoConnectLogging = 0;
 
-//********** Moved to zOnConnect.cs **********
+//********** Moved to zTNspoof.cs **********
 
 //package AltConnectLog
 //{

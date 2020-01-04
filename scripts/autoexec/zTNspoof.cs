@@ -1,4 +1,4 @@
-// zOnConnect.cs
+// zTNspoof.cs
 //
 // To get the guid of the client(If they have one) for reference.
 // Generally for normal server things that need it.
@@ -9,6 +9,13 @@
 // This is unsecure, as in no hashing or certificate checking occurs.
 // GUIDs are not verified and run the risk of being altered clientside.
 // Use at your own risk.
+//
+// Clan tags are also here.
+// It detects any kind of @tag@name or name@tag@
+// And converts the @tag@ to yellow deleting the @s
+//
+// Call the zAltConnect log is also here.
+// Consolidating the overrides of the OnConnect function.
 
 // This file is here
 $GetGUID = true;
