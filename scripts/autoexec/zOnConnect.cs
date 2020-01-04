@@ -250,9 +250,15 @@ function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %
 
     %client.name = addTaggedString(%name);
     if(%client.isSmurf)
+	{
+	   %smurfName = stripChars( detag( %smurfName ), "@" );
        %client.nameBase = %smurfName;
+	}
     else
-       %client.nameBase = %realName;
+	{
+       %realName = stripChars( detag( %realName ), "@" );
+	   %client.nameBase = %realName;
+	}
 
    //Allow - ChocoTaco
    // Make sure that the connecting client is not trying to use a bot skin:
