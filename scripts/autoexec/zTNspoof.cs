@@ -230,14 +230,17 @@ function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %
     %tag = getField(strreplace(%name,"@","\t"),1);
 	%prepend = getField(strreplace(%name,"@","\t"),2);
 	%append = getField(strreplace(%name,"@","\t"),0);
-	if(%tag !$= "" && %append $= "" && %prepend $= "") //If someone trys @myname@
+	if(%tag $= "") //Normal
 		%nameMode = "OTHER";
-	else if(%tag !$= "" && %prepend !$= "")
-		%nameMode = "PREPEND";
-	else if(%tag !$= "" && %append !$= "")
-		%nameMode = "APPEND";
-	else if(%tag $= "") //Normal
-		%nameMode = "OTHER";
+	else //%tag isnt blank
+	{
+		if(%append $= "" && %prepend $= "") //If someone trys @myname@
+			%nameMode = "OTHER";
+		else if(%prepend !$= "") //@Fancytag|@name
+			%nameMode = "PREPEND";
+		else if(%append !$= "") //name@|Fancytag@
+			%nameMode = "APPEND";
+	}
 	
 	switch$(%nameMode)
 	{
