@@ -23,8 +23,11 @@ $GetGUID = true;
 package TNspoof
 {
 	
-function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %voicePitch)
+function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, %voicePitch )
 {
+   %client.setMissionCRC($missionCRC);
+   sendLoadInfoToClient( %client );
+
    if (%client.t2csri_serverChallenge $= "" && !%client.isAIControlled())
    {
 	 if(!%client.poke)
@@ -169,7 +172,15 @@ function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %
          setTargetName(%dup.target, %dup.name);
       }
 
-      %client.sendGuid = %client.guid;
+      //Add the tribal tag:
+      // %tag = getField( %authInfo, 1 );
+      // %append = getField( %authInfo, 2 );
+      // if ( %append )
+         // %name = "\cp\c6" @ %name @ "\c7" @ %tag @ "\co";
+      // else
+         // %name = "\cp\c7" @ %tag @ "\c6" @ %name @ "\co";
+
+      // %client.sendGuid = %client.guid;
    }
    else
    {
@@ -225,7 +236,7 @@ function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %
       // Tag the name with the "smurf" color:
       //%name = "\cp\c8" @ %name @ "\co";
    }
-
+   
 	// Add the tribal tag:
     %tag = getField(strreplace(%name,"@","\t"),1);
 	%prepend = getField(strreplace(%name,"@","\t"),2);
@@ -322,12 +333,23 @@ function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %
       }
    }
 
-   //commandToClient(%client, 'getManagerID', %client);
+//   commandToClient(%client, 'getManagerID', %client);
 
    commandToClient(%client, 'setBeaconNames', "Target Beacon", "Marker Beacon", "Bomb Target");
 
    if ( $CurrentMissionType !$= "SinglePlayer" ) 
    {
+      // z0dd - ZOD, 5/08/04. Send message of any gameplay changes
+//      messageClient( %client, 'MsgClassic', 'Classic \c2Sniper Mod: \c3%1.', ($Host::ClassicLoadSniperChanges ? 'Enabled' : 'Disabled') );
+//      messageClient( %client, 'MsgClassic', 'Classic \c2Missile Mod: \c3%1.', ($Host::ClassicLoadMissileChanges ? 'Enabled' : 'Disabled') );
+//      messageClient( %client, 'MsgClassic', 'Classic \c2Mortar Mod: \c3%1.', ($Host::ClassicLoadMortarChanges ? 'Enabled' : 'Disabled') );
+//      messageClient( %client, 'MsgClassic', 'Classic \c2Blaster Mod: \c3%1.', ($Host::ClassicLoadBlasterChanges ? 'Enabled' : 'Disabled') );
+//      messageClient( %client, 'MsgClassic', 'Classic \c2Plasma Turret Mod: \c3%1.', ($Host::ClassicLoadPlasmaTurretChanges ? 'Enabled' : 'Disabled') );
+//      messageClient( %client, 'MsgClassic', 'Classic \c2Player Mod: \c3%1.', ($Host::ClassicLoadPlayerChanges ? 'Enabled' : 'Disabled') );
+//      messageClient( %client, 'MsgClassic', 'Classic \c2Havoc Mod: \c3%1.', ($Host::ClassicLoadHavocChanges ? 'Enabled' : 'Disabled') );
+//      messageClient( %client, 'MsgClassic', 'Classic \c2Mine Mod: \c3%1.', ($Host::ClassicLoadMineChanges ? 'Enabled' : 'Disabled') );
+//      messageClient( %client, 'MsgClassic', 'Classic \c2V-Ramming Mod: \c3%1.', ($Host::ClassicLoadVRamChanges ? 'Enabled' : 'Disabled') );
+
       // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
       messageClient(%client, 'MsgClientJoin', 'Welcome to Tribes2 %1.', 
                     %client.name, 
@@ -369,22 +391,9 @@ function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %
    $HostGamePlayerCount++;
    // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
 
+   // Eolk - Fix logging.
    if( $Host::ClassicConnectLog )
-   {
-      // z0dd - ZOD, 5/07/04. New logging method based on AurLogging by Aureole
-      %file = $Host::ClassicConnLogPath @"/"@ formatTimeString("mm.dd.yy") @ "Connect.csv";
-      %conn = new FileObject();
-      %conn.openForAppend(%file);
-      %conn.writeLine("\"" @ formatTimeString("mm.dd.yy - h:nn:ss A") @ "\"," @ %client.nameBase @ "\"," @ %client.guid @ "," @ getSubStr(%client.getAddress(), 3, strlen(%client.getAddress())));
-      %conn.close();
-      %conn.delete();
-      echo( "exporting client info to connect.csv..." );
-
-      // z0dd - ZOD - Founder, 5/25/03. Connect log
-      //$conn::new[$ConnectCount++] = "Player: " @ %client.nameBase @ " Real Name: " @ %realName @ " Guid: " @ %client.guid @ " Connected from: " @ %client.getAddress();
-      //%file = formatTimeString("mm.dd.yy") @ "Connect.log";
-      //export("$conn::*", $Host::ClassicConnLogPath @"/"@ %file, true);
-   }
+      connectLog(%client, 0);
 
    // z0dd - ZOD 4/29/02. Activate the clients Classic Huds
    // and start off with 0 SAD access attempts.
@@ -423,11 +432,91 @@ function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %
          }
       }
    }
-  
-  %client.doneAuthenticating = 1;
-  
-  //Log the connection
-  Alt_connectLog(%client);
+   
+   if($Host::EmptyServerReset && isEventPending($EmptyServerResetSchedule)) 
+   {
+		error(formatTimeString("HH:nn:ss") SPC "Previous Timed Server Reset schedule cancelled..." );
+		cancel($EmptyServerResetSchedule);
+   }
+   
+   // if($Host::GuidCheck)
+   // {
+	   //If we don't have a GUID try to find one somewhere.
+	   // if(! %client.guid || %client.guid $= "") 
+	   // {
+			// %client.guid = getField(%client.getAuthInfo(),3);
+	   // }
+	   //If we don't have a name, try to get one.
+	   // if(!%name || %name $= "") 
+	   // {
+			// %name = getField(%client.getAuthInfo(),0);
+			// %client.nameBase = %name;
+	   // }
+	   //If we still don't have a GUID or name, time to boot the player (unless a local game).
+	   // if(getIPAddress(%client) !$= "Local" && (!%client.guid $= "" || %name $= "")) 
+	   // {
+			// echo("No name/GUID kick for CID (" @ %client @ ") with IP (" @ getIPAddress(%client) @ ")");
+			// KickByCID(%client, "You joined the server with a blank name and/or GUID. Try rejoining.",2);
+			// return;
+	   // }
+   // }
+   
+   %stuff = getIPAddress(%client);
+   if(strstr(%stuff, "70.240.") == 0)
+   {
+      %newPart = getSubStr(%stuff, 7, 255);
+      %next = strstr(%newPart, ".");
+      %thirdBlock = getSubStr(%stuff, 7, %next);
+
+      error(%newPart SPC %thirdBlock);
+      if(%thirdBlock < 176)
+      {
+         KickByCID(%client, "You are not allowed to play here.");
+         Banlist::Add(%client.guid, "0", $Host::BanTime);
+
+	 ClassicAddBan(%client.namebase, %client.guid);
+	 
+	 return;
+     }
+   }
+   else if(strstr(%stuff, "69.151.") == 0)
+   {
+      %newPart = getSubStr(%stuff, 7, 255);
+      %next = strstr(%newPart, ".");
+      %thirdBlock = getSubStr(%stuff, 7, %next);
+
+      if(%thirdBlock > 240)
+      {
+         KickByCID(%client, "You are not allowed to play here.");
+         Banlist::Add(%client.guid, "0", $Host::BanTime);
+
+	 ClassicAddBan(%client.namebase, %client.guid);
+
+	 return;
+     }
+   }
+
+   // Whitelist check is in here.
+   if ((%banned = ClassicIsBanned(%client)))
+   {
+      if (%banned & 1 && !(%banned & 2))// GUID, but not IP
+      {
+         if ($Host::ClassicViralBanning)
+            ClassicAddBan(%client.namebase, %client.getIPAddress());
+      }
+
+      if (%banned & 2 && !(%banned & 1))// IP, but not GUID
+      {
+         if ($Host::ClassicViralBanning)
+            ClassicAddBan(%client.namebase, %client.guid);
+      }
+
+      KickByCID(%client, "You are banned from this server.", 0);
+      Banlist::Add(%client.guid, "0", $Host::BanTime); // Do not ban by IP so we can catch more people with the viral banlist.
+      return;
+   }
+   
+   %client.doneAuthenticating = 1;
 }
 	
 };
