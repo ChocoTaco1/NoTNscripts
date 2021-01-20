@@ -111,6 +111,9 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
    %realName = getField( %authInfo, 0 );
    if ( $PlayingOnline && $Host::NoSmurfs )
       %name = %realName;
+	  
+   //Remove <> to not mess up tribesnext json
+   %name = stripChars( detag( %name ), "<>" );
 
    if ( strcmp( %name, %realName ) == 0 )
    {
@@ -442,18 +445,18 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
    // if($Host::GuidCheck)
    // {
 	   //If we don't have a GUID try to find one somewhere.
-	   // if(! %client.guid || %client.guid $= "") 
+	   // if(!%client.guid || %client.guid $= "") 
 	   // {
 			// %client.guid = getField(%client.getAuthInfo(),3);
 	   // }
 	   //If we don't have a name, try to get one.
-	   // if(!%name || %name $= "") 
+	   // if(%name $= "") 
 	   // {
-			// %name = getField(%client.getAuthInfo(),0);
-			// %client.nameBase = %name;
+		   // %name = getField(%client.getAuthInfo(),0);
+		   // %client.nameBase = %name;
 	   // }
 	   //If we still don't have a GUID or name, time to boot the player (unless a local game).
-	   // if(getIPAddress(%client) !$= "Local" && (!%client.guid $= "" || %name $= "")) 
+	   // if(getIPAddress(%client) !$= "Local" && (%client.guid $= "" || %name $= ""))
 	   // {
 			// echo("No name/GUID kick for CID (" @ %client @ ") with IP (" @ getIPAddress(%client) @ ")");
 			// KickByCID(%client, "You joined the server with a blank name and/or GUID. Try rejoining.",2);
@@ -461,53 +464,54 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
 	   // }
    // }
    
-   %stuff = getIPAddress(%client);
-   if(strstr(%stuff, "70.240.") == 0)
-   {
-      %newPart = getSubStr(%stuff, 7, 255);
-      %next = strstr(%newPart, ".");
-      %thirdBlock = getSubStr(%stuff, 7, %next);
+   // %stuff = getIPAddress(%client);
+   // if(strstr(%stuff, "70.240.") == 0)
+   // {
+      // %newPart = getSubStr(%stuff, 7, 255);
+      // %next = strstr(%newPart, ".");
+      // %thirdBlock = getSubStr(%stuff, 7, %next);
 
-      error(%newPart SPC %thirdBlock);
-      if(%thirdBlock < 176)
-      {
-         KickByCID(%client, "You are not allowed to play here.");
-         Banlist::Add(%client.guid, "0", $Host::BanTime);
+      // error(%newPart SPC %thirdBlock);
+      // if(%thirdBlock < 176)
+      // {
+         // KickByCID(%client, "You are not allowed to play here.");
+         // Banlist::Add(%client.guid, "0", $Host::BanTime);
 
-	 ClassicAddBan(%client.namebase, %client.guid);
+	 // ClassicAddBan(%client.namebase, %client.guid);
 	 
-	 return;
-     }
-   }
-   else if(strstr(%stuff, "69.151.") == 0)
-   {
-      %newPart = getSubStr(%stuff, 7, 255);
-      %next = strstr(%newPart, ".");
-      %thirdBlock = getSubStr(%stuff, 7, %next);
+	 // return;
+     // }
+   // }
+   // else if(strstr(%stuff, "69.151.") == 0)
+   // {
+      // %newPart = getSubStr(%stuff, 7, 255);
+      // %next = strstr(%newPart, ".");
+      // %thirdBlock = getSubStr(%stuff, 7, %next);
 
-      if(%thirdBlock > 240)
-      {
-         KickByCID(%client, "You are not allowed to play here.");
-         Banlist::Add(%client.guid, "0", $Host::BanTime);
+      // if(%thirdBlock > 240)
+      // {
+         // KickByCID(%client, "You are not allowed to play here.");
+         // Banlist::Add(%client.guid, "0", $Host::BanTime);
 
-	 ClassicAddBan(%client.namebase, %client.guid);
+	 // ClassicAddBan(%client.namebase, %client.guid);
 
-	 return;
-     }
-   }
+	 // return;
+     // }
+   // }
 
    // Whitelist check is in here.
-   if ((%banned = ClassicIsBanned(%client)))
+   %banned = ClassicIsBanned(%client);
+   if(%banned)
    {
-      if (%banned & 1 && !(%banned & 2))// GUID, but not IP
+	  if(%banned & 1 && !(%banned & 2))// GUID, but not IP
       {
-         if ($Host::ClassicViralBanning)
+         if($Host::ClassicViralBanning)
             ClassicAddBan(%client.namebase, %client.getIPAddress());
       }
 
-      if (%banned & 2 && !(%banned & 1))// IP, but not GUID
+      if(%banned & 2 && !(%banned & 1))// IP, but not GUID
       {
-         if ($Host::ClassicViralBanning)
+         if($Host::ClassicViralBanning)
             ClassicAddBan(%client.namebase, %client.guid);
       }
 
