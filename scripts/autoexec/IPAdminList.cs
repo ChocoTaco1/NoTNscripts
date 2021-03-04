@@ -31,7 +31,7 @@ package IPAdminList
 function isOnAdminList(%client)
 {
    %ip = getField(strreplace(%client.getAddress(),":","\t"),1);
-   %guidip = %ip @ ":" @ %client.guid;
+   //%guidip = %ip @ ":" @ %client.guid;
    
    if( !%totalRecords = getFieldCount( $Host::AdminList ) )
    {   
@@ -55,7 +55,7 @@ function isOnAdminList(%client)
 function isOnSuperAdminList(%client)
 {
    %ip = getField(strreplace(%client.getAddress(),":","\t"),1);
-   %guidip = %ip @ ":" @ %client.guid;
+   //%guidip = %ip @ ":" @ %client.guid;
    
    if( !%totalRecords = getFieldCount( $Host::superAdminList ) )
    {   
@@ -64,7 +64,7 @@ function isOnSuperAdminList(%client)
    
    for(%i = 0; %i < %totalRecords; %i++)
    {
-      %record = getField( getRecord( $Host::AdminList, 0 ), %i);
+      %record = getField( getRecord( $Host::superAdminList, 0 ), %i);
 	  //Separate the two fields
 	  %recordip = getField(strreplace(%record,":","\t"),0);
 	  %recordguid = getField(strreplace(%record,":","\t"),1);
